@@ -32,4 +32,8 @@ public class RoleService {
     public Role getUserRole() {
         return roleRepository.getUserRole();
     }
+
+    public Role getAdminRole() {
+        return roleRepository.getAdminRole();
+    }
 }

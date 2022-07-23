@@ -6,7 +6,8 @@ CREATE TABLE users(
 	password VARCHAR(200) NOT NULL,
 	first_name VARCHAR(200) NOT NULL,
 	last_name VARCHAR(200) NOT NULL,
-	user_role VARCHAR(100) NOT NULL
+	money numeric
+
 );
 
 CREATE TABLE roles (

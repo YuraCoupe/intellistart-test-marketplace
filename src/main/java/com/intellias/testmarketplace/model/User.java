@@ -1,11 +1,13 @@
 package com.intellias.testmarketplace.model;
 
 import org.hibernate.annotations.Type;
+import org.springframework.format.annotation.NumberFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -18,6 +20,7 @@ public class User {
     private String password;
     private String firstName;
     private String lastName;
+    private BigDecimal money;
     private Set<Role> roles;
     private Set<Product> products;
 
@@ -71,6 +74,16 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    @Column(name = "money")
+    @NumberFormat
+    public BigDecimal getMoney() {
+        return money;
+    }
+
+    public void setMoney(BigDecimal money) {
+        this.money = money;
     }
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
