@@ -10,11 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import ua.goit.ProductStore.model.ErrorMessage;
-import ua.goit.ProductStore.model.Role;
-import ua.goit.ProductStore.model.User;
-import ua.goit.ProductStore.repository.RoleRepository;
-import ua.goit.ProductStore.repository.UserRepository;
 
 import java.util.*;
 
@@ -40,7 +35,7 @@ public class UserValidator implements Validator {
 
         User user = (User) obj;
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "email.required", "Enter user email");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "username.required", "Enter username");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "firstName", "firstName.required", "Enter user first name");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "lastName", "lastName.required", "Enter user last name");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "password.required", "Enter user password");
@@ -48,7 +43,7 @@ public class UserValidator implements Validator {
         User userToFind = userRepository.findByUsername(user.getUsername()).orElse(new User());
 
         if (Objects.isNull(user.getId()) && Objects.nonNull(userToFind.getId())) {
-            errors.rejectValue("email", "email.already.exist", "user with this email already exists");
+            errors.rejectValue("username", "username.already.exist", "user with this username already exists");
         }
 
         if (Objects.isNull(user.getRoles())) {
