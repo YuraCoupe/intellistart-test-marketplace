@@ -38,6 +38,11 @@
                         <p style="color:red">${error}</p>
                     </c:forEach>
                 </c:if>
+                <c:if test="${not empty message}">
+                    <c:forEach items="${message.messages}" var="message">
+                        <p style="color:green">${message}</p>
+                    </c:forEach>
+                </c:if>
             </div>
 
             <table class="table table-hover">
@@ -63,9 +68,16 @@
                         <td>
                             <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                                 <div class="btn-group me-2" role="group" aria-label="Second group">
-                                     <a href="/products/buy/${product.id}" type="button" class="btn btn-success">Buy</a>
-                                     <a href="/products/edit/${product.id}" type="button" class="btn btn-warning">Edit</a>
-                                     <a href="/products/delete/${product.id}" type="button" class="btn btn-danger">Remove</a>
+                                    <c:choose>
+                                        <c:when test = "${checkout == false}">
+                                            <a href="/products/buy/${product.id}" type="button" class="btn btn-success">Buy</a>
+                                            <a href="/products/edit/${product.id}" type="button" class="btn btn-warning">Edit</a>
+                                            <a href="/products/delete/${product.id}" type="button" class="btn btn-danger">Delete</a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="/products/remove/${product.id}" type="button" class="btn btn-danger">Remove</a>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
                         </td>

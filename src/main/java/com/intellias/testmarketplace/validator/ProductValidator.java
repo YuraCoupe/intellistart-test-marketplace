@@ -50,14 +50,21 @@ public class ProductValidator implements Validator {
         }
     }
 
-    public ErrorMessage validateUserToDelete(UUID id) {
-        ErrorMessage errorMessage = new ErrorMessage();
+    public ErrorMessage validateUserMoney(User user, Product product, ErrorMessage errorMessage) {
         List<String> errors = new ArrayList<>();
-        Set<User> admins = userRepository.findUsersWithAdministratorRole();
+        if (user.getMoney().compareTo(product.getPrice()) == -1) {
+            errors.add(String.format("You do not have enough money to buy %s."
+                    , product.getName()));
+        }
+        errorMessage.setErrors(errors);
+        return errorMessage;
+    }
 
-        if (admins.size() == 1) {
-            errors.add(String.format("User with email %s is the one with Admin role. Impossible to delete last Admin user."
-                    , userRepository.findById(id).get().getUsername()));
+    public ErrorMessage validateAlreadyBoughtProduct(User user, Product product, ErrorMessage errorMessage) {
+        List<String> errors = new ArrayList<>();
+        if (user.getProducts().contains(product)) {
+            errors.add(String.format("You've already bought %s."
+                    , product.getName()));
         }
         errorMessage.setErrors(errors);
         return errorMessage;

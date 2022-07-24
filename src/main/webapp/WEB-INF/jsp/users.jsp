@@ -12,9 +12,9 @@
         <div class="container">
             <form action="/users/edit">
                 <div class="form-group">
-                    <label for="Id">User email:</label><br>
+                    <label for="Id">Username:</label><br>
                     <select class="form-control" id="id" name="id">
-                        <option disabled selected value> -- select email -- </option>
+                        <option disabled selected value> -- select username -- </option>
                         <c:forEach items="${users}" var="user">
                             <option value="${user.id}"><c:out value="${user.username}"/></option>
                         </c:forEach>

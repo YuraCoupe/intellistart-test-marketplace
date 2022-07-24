@@ -46,6 +46,10 @@
                     <form:input path="lastName" type="text" class="form-control" id="lastName" placeholder="Enter last name" name="lastName" value="${user.lastName}"/>
                     <form:errors path="lastName" cssClass="error"/>
                     <br>
+                    <form:label path="money">Money:</form:label><br>
+                    <form:input path="money" type="number" class="form-control" id="money" placeholder="Enter money" name="money" value="${user.money}"/>
+                    <form:errors path="money" cssClass="error"/>
+                    <br>
                     <security:authorize access="hasRole('ROLE_ADMIN')">
                     <form:label path="roles">Roles:</form:label><br>
                     <c:forEach items="${roles}" var="role">

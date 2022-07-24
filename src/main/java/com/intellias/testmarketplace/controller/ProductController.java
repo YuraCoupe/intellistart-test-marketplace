@@ -1,5 +1,7 @@
 package com.intellias.testmarketplace.controller;
 
+import com.intellias.testmarketplace.model.ErrorMessage;
+import com.intellias.testmarketplace.model.Message;
 import com.intellias.testmarketplace.model.Product;
 import com.intellias.testmarketplace.model.User;
 import com.intellias.testmarketplace.service.ProductService;
@@ -19,9 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @RequestMapping(path = "/products")
@@ -49,7 +49,9 @@ public class ProductController {
     @RequestMapping(method = RequestMethod.GET)
     public String getProducts(Model model) {
         Set<Product> products = productService.findAll();
+        boolean checkout = false;
         model.addAttribute("products", products);
+        model.addAttribute("checkout", checkout);
         return "products";
     }
 
@@ -57,7 +59,9 @@ public class ProductController {
     public String getProductsOnCheckout(Model model, Authentication authentication) {
         User authUser = userService.findByUsername(authentication.getName());
         Set<Product> products = productService.findByUserId(authUser.getId());
+        boolean checkout = true;
         model.addAttribute("products", products);
+        model.addAttribute("checkout", checkout);
         return "products";
     }
 
@@ -77,11 +81,12 @@ public class ProductController {
     @RequestMapping(path = "/edit", method = RequestMethod.GET)
     public String showEditFormWithParam(@RequestParam UUID id, Model model) {
         model.addAttribute("product", productService.findById(id));
-        return "product";    }
+        return "product";
+    }
 
     @RequestMapping(method = RequestMethod.POST)
     public ModelAndView submit(@Valid @ModelAttribute("product") Product product,
-                         BindingResult result, ModelAndView model) {
+                               BindingResult result, ModelAndView model) {
         if (result.hasErrors()) {
             model.addObject("product", product);
             model.setViewName("product");
@@ -90,7 +95,9 @@ public class ProductController {
         }
         productService.save(product);
         Set<Product> products = productService.findAll();
+        boolean checkout = false;
         model.addObject("products", products);
+        model.addObject("checkout", checkout);
         model.setViewName("products");
         return model;
     }
@@ -99,12 +106,49 @@ public class ProductController {
     public String buy(@PathVariable UUID id, ModelMap model, Authentication authentication) {
         User authUser = userService.findByUsername(authentication.getName());
         Product product = productService.findById(id);
-        Set<Product> products = productService.findByUserId(authUser.getId());
-        products.add(product);
-        authUser.setProducts(products);
-        userService.save(authUser);
-        products = productService.findAll();
+        ErrorMessage errorMessage = new ErrorMessage();
+        errorMessage = validatorService.validateUserMoney(authUser, product, errorMessage);
+        errorMessage = validatorService.validateAlreadyBoughtProduct(authUser, product, errorMessage);
+
+        if (!errorMessage.getErrors().isEmpty()) {
+            model.addAttribute("errorMessage", errorMessage);
+        } else {
+            Set<Product> products = productService.findByUserId(authUser.getId());
+            products.add(product);
+            authUser.setProducts(products);
+            authUser.setMoney(authUser.getMoney().subtract(product.getPrice()));
+            userService.save(authUser);
+        }
+        Message message = new Message();
+        List<String> messages = new ArrayList<>();
+        messages.add(String.format("You've successfully add %s to the checkout", product.getName()));
+        message.setMessages(messages);
+        Set<Product> products = productService.findAll();
+        boolean checkout = false;
         model.addAttribute("products", products);
+        model.addAttribute("checkout", checkout);
+        model.addAttribute("message", message);
+        return "products";
+    }
+
+    @RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
+    public String remove(@PathVariable UUID id, ModelMap model, Authentication authentication) {
+        User authUser = userService.findByUsername(authentication.getName());
+        Product product = productService.findById(id);
+        Set<Product> products = productService.findByUserId(authUser.getId());
+        products.remove(product);
+        authUser.setProducts(products);
+        authUser.setMoney(authUser.getMoney().add(product.getPrice()));
+        userService.save(authUser);
+        products = productService.findByUserId(authUser.getId());
+        Message message = new Message();
+        List<String> messages = new ArrayList<>();
+        messages.add(String.format("You've successfully removed %s from the checkout", product.getName()));
+        message.setMessages(messages);
+        boolean checkout = true;
+        model.addAttribute("products", products);
+        model.addAttribute("checkout", checkout);
+        model.addAttribute("message", message);
         return "products";
     }
 
@@ -112,7 +156,9 @@ public class ProductController {
     public String delete(@PathVariable UUID id, ModelMap model) {
         productService.delete(id);
         Set<Product> products = productService.findAll();
+        boolean checkout = false;
         model.addAttribute("products", products);
+        model.addAttribute("checkout", checkout);
         return "products";
     }
 
