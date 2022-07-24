@@ -27,4 +27,7 @@ public interface UserRepository extends CrudRepository<User, UUID> {
     @Query("FROM User u LEFT JOIN FETCH u.roles r WHERE r.name = 'ROLE_USER'")
     Set<User> findUsersWithUserRole();
 
+    @Query("FROM User u LEFT JOIN FETCH u.products p WHERE p.id = (:id)")
+    Set<User> findUsersByProductId(@Param("id") UUID id);
+
 }

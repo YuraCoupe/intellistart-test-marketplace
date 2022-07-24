@@ -42,4 +42,6 @@ public class ProductService {
     public void delete(UUID id) {
         productRepository.deleteById(id);
     }
+
+    public void deleteFromCheckout(UUID id) {productRepository.deleteFromCheckOut(id);}
 }

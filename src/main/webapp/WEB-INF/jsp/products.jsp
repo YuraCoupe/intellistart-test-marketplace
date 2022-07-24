@@ -31,6 +31,7 @@
                     <a href="/products/" type="button" class="btn btn-success">All</a>
                     <a href="/products/checkout" type="button" class="btn btn-info">Checkout</a>
                 </div>
+                <div style="float: right; font-weight: bold">Money: ${money}</div>
             </div>
             <div>
                 <c:if test="${not empty errorMessage}">
@@ -45,6 +46,7 @@
                 </c:if>
             </div>
 
+            <c:if test = "${not empty products}">
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -85,6 +87,7 @@
                     </c:forEach>
                 </tbody>
             </table>
+            </c:if>
         </div>
     </body>
 </html>

@@ -39,6 +39,10 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(String.format("User with id - %s does not exist", id)));
     }
 
+    public Set<User> findUsersByProductId(UUID id) {
+        return userRepository.findUsersByProductId(id);
+    }
+
     public void save(User user) {
         userRepository.save(user);
     }
