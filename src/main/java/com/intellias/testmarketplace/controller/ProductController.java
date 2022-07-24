@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Controller
@@ -47,21 +48,26 @@ public class ProductController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public String getProducts(Model model) {
+    public String getProducts(Model model, Authentication authentication) {
+        User authUser = userService.findByUsername(authentication.getName());
+        BigDecimal money = authUser.getMoney();
         Set<Product> products = productService.findAll();
         boolean checkout = false;
         model.addAttribute("products", products);
         model.addAttribute("checkout", checkout);
+        model.addAttribute("money", money);
         return "products";
     }
 
     @RequestMapping(path = "/checkout", method = RequestMethod.GET)
     public String getProductsOnCheckout(Model model, Authentication authentication) {
         User authUser = userService.findByUsername(authentication.getName());
+        BigDecimal money = authUser.getMoney();
         Set<Product> products = productService.findByUserId(authUser.getId());
         boolean checkout = true;
         model.addAttribute("products", products);
         model.addAttribute("checkout", checkout);
+        model.addAttribute("money", money);
         return "products";
     }
 
@@ -86,7 +92,7 @@ public class ProductController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ModelAndView submit(@Valid @ModelAttribute("product") Product product,
-                               BindingResult result, ModelAndView model) {
+                               BindingResult result, ModelAndView model, Authentication authentication) {
         if (result.hasErrors()) {
             model.addObject("product", product);
             model.setViewName("product");
@@ -96,8 +102,11 @@ public class ProductController {
         productService.save(product);
         Set<Product> products = productService.findAll();
         boolean checkout = false;
+        User authUser = userService.findByUsername(authentication.getName());
+        BigDecimal money = authUser.getMoney();
         model.addObject("products", products);
         model.addObject("checkout", checkout);
+        model.addObject("money", money);
         model.setViewName("products");
         return model;
     }
@@ -109,6 +118,8 @@ public class ProductController {
         ErrorMessage errorMessage = new ErrorMessage();
         errorMessage = validatorService.validateUserMoney(authUser, product, errorMessage);
         errorMessage = validatorService.validateAlreadyBoughtProduct(authUser, product, errorMessage);
+        Message message = new Message();
+        List<String> messages = new ArrayList<>();
 
         if (!errorMessage.getErrors().isEmpty()) {
             model.addAttribute("errorMessage", errorMessage);
@@ -118,16 +129,17 @@ public class ProductController {
             authUser.setProducts(products);
             authUser.setMoney(authUser.getMoney().subtract(product.getPrice()));
             userService.save(authUser);
+            messages.add(String.format("You've successfully add %s to the checkout", product.getName()));
+            message.setMessages(messages);
+            model.addAttribute("message", message);
         }
-        Message message = new Message();
-        List<String> messages = new ArrayList<>();
-        messages.add(String.format("You've successfully add %s to the checkout", product.getName()));
-        message.setMessages(messages);
         Set<Product> products = productService.findAll();
+        BigDecimal money = authUser.getMoney();
         boolean checkout = false;
         model.addAttribute("products", products);
         model.addAttribute("checkout", checkout);
-        model.addAttribute("message", message);
+        model.addAttribute("money", money);
+
         return "products";
     }
 
@@ -146,19 +158,34 @@ public class ProductController {
         messages.add(String.format("You've successfully removed %s from the checkout", product.getName()));
         message.setMessages(messages);
         boolean checkout = true;
+        BigDecimal money = authUser.getMoney();
         model.addAttribute("products", products);
         model.addAttribute("checkout", checkout);
         model.addAttribute("message", message);
+        model.addAttribute("money", money);
         return "products";
     }
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
-    public String delete(@PathVariable UUID id, ModelMap model) {
+    public String delete(@PathVariable UUID id, ModelMap model, Authentication authentication) {
+        Product product = productService.findById(id);
+        Set<User> users = userService.findUsersByProductId(id);
+        if (!users.isEmpty()) {
+            for (User user:
+                 users) {
+                user.setMoney(user.getMoney().add(product.getPrice()));
+                userService.save(user);
+            }
+        }
+        productService.deleteFromCheckout(id);
         productService.delete(id);
         Set<Product> products = productService.findAll();
         boolean checkout = false;
+        User authUser = userService.findByUsername(authentication.getName());
+        BigDecimal money = authUser.getMoney();
         model.addAttribute("products", products);
         model.addAttribute("checkout", checkout);
+        model.addAttribute("money", money);
         return "products";
     }
 
