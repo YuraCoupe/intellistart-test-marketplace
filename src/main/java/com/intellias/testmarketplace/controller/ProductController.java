@@ -1,19 +1,25 @@
 package com.intellias.testmarketplace.controller;
 
 import com.intellias.testmarketplace.model.Product;
+import com.intellias.testmarketplace.model.User;
 import com.intellias.testmarketplace.service.ProductService;
 import com.intellias.testmarketplace.service.UserService;
+import com.intellias.testmarketplace.validator.ProductValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,11 +28,22 @@ import java.util.UUID;
 public class ProductController {
     private final ProductService productService;
     private final UserService userService;
+    private final ProductValidator validatorService;
 
     @Autowired
-    public ProductController(ProductService productService, UserService userService) {
+    public ProductController(ProductService productService, UserService userService, ProductValidator validatorService) {
         this.productService = productService;
         this.userService = userService;
+        this.validatorService = validatorService;
+    }
+
+    @Autowired
+    @Qualifier("productValidator")
+    private Validator validator;
+
+    @InitBinder("product")
+    private void initBinder(WebDataBinder binder) {
+        binder.setValidator(validator);
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -35,6 +52,15 @@ public class ProductController {
         model.addAttribute("products", products);
         return "products";
     }
+
+    @RequestMapping(path = "/checkout", method = RequestMethod.GET)
+    public String getProductsOnCheckout(Model model, Authentication authentication) {
+        User authUser = userService.findByUsername(authentication.getName());
+        Set<Product> products = productService.findByUserId(authUser.getId());
+        model.addAttribute("products", products);
+        return "products";
+    }
+
 
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String showNewForm(Model model) {
@@ -67,6 +93,19 @@ public class ProductController {
         model.addObject("products", products);
         model.setViewName("products");
         return model;
+    }
+
+    @RequestMapping(value = "/buy/{id}", method = RequestMethod.GET)
+    public String buy(@PathVariable UUID id, ModelMap model, Authentication authentication) {
+        User authUser = userService.findByUsername(authentication.getName());
+        Product product = productService.findById(id);
+        Set<Product> products = productService.findByUserId(authUser.getId());
+        products.add(product);
+        authUser.setProducts(products);
+        userService.save(authUser);
+        products = productService.findAll();
+        model.addAttribute("products", products);
+        return "products";
     }
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)

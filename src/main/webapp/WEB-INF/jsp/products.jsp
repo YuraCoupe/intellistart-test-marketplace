@@ -27,6 +27,10 @@
                 <div class="btn-group me-2" role="group" aria-label="Second group">
                    <a href="/products/new" type="button" class="btn btn-primary">New</a>
                 </div>
+                <div class="btn-group me-2" role="group" aria-label="Second group">
+                    <a href="/products/" type="button" class="btn btn-success">All</a>
+                    <a href="/products/checkout" type="button" class="btn btn-info">Checkout</a>
+                </div>
             </div>
             <div>
                 <c:if test="${not empty errorMessage}">
@@ -59,6 +63,7 @@
                         <td>
                             <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                                 <div class="btn-group me-2" role="group" aria-label="Second group">
+                                     <a href="/products/buy/${product.id}" type="button" class="btn btn-success">Buy</a>
                                      <a href="/products/edit/${product.id}" type="button" class="btn btn-warning">Edit</a>
                                      <a href="/products/delete/${product.id}" type="button" class="btn btn-danger">Remove</a>
                                 </div>

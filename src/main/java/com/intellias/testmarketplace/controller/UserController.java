@@ -25,6 +25,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -52,7 +53,7 @@ public class UserController {
 
     @InitBinder("user")
     private void initBinder(WebDataBinder binder) {
-        binder.setValidator(validator);
+        binder.addValidators(validator);
         binder.registerCustomEditor(Role.class, "roles", new RoleEditor(roleService));
     }
 
@@ -116,9 +117,17 @@ public class UserController {
         return "user";    }
 
     @RequestMapping(path = "/save", method = RequestMethod.POST)
-    public ModelAndView submit(@ModelAttribute("user") @Validated User user,
+    public ModelAndView submit(@Valid @ModelAttribute("user") User user,
                          BindingResult result) {
         ModelAndView model = new ModelAndView();
+        if (result.hasErrors()) {
+            model.addObject("user", user);
+            model.setViewName("user");
+            Set<Role> roles = roleService.findAll();
+            model.addObject("roles", roles);
+            model.setStatus(HttpStatus.BAD_REQUEST);
+            return model;
+        }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if ((!(authentication instanceof AnonymousAuthenticationToken) && result.hasErrors())
                 || ((authentication instanceof AnonymousAuthenticationToken)) && result.hasErrors() && !result.hasFieldErrors("roles")){

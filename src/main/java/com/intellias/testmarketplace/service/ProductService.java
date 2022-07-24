@@ -30,6 +30,11 @@ public class ProductService {
                 .collect(Collectors.toSet());
     }
 
+    public Set<Product> findByUserId(UUID id) {
+        return StreamSupport.stream(productRepository.findByUserId(id).spliterator(), false)
+                .collect(Collectors.toSet());
+    }
+
     public void save(Product product) {
         productRepository.save(product);
     }

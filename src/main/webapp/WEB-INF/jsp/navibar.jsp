@@ -3,7 +3,7 @@
            <nav class="navbar navbar-inverse">
               <div class="container">
                 <div class="navbar-header">
-                  <a class="navbar-brand" href="/">Good product store</a>
+                  <a class="navbar-brand" href="/">IntelliStart Test Marketplace</a>
                 </div>
                 <ul class="nav navbar-nav">
                   <security:authorize access="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
