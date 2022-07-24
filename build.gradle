@@ -1,6 +1,6 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.2'
-	id 'io.spring.dependency-management' version '1.0.12.RELEASE'
+	id 'org.springframework.boot' version '2.2.6.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'java'
 	id 'war'
 }
@@ -13,10 +13,21 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	springSecurityVersion = '5.2.12.RELEASE'
+	jstlVersion = '1.2'
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation group: 'org.springframework.security', name: 'spring-security-taglibs', version: "${springSecurityVersion}"
+	implementation "jstl:jstl:${jstlVersion}"
+	implementation 'org.flywaydb:flyway-core'
+	implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+	implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: '9.0.34'
+
 	runtimeOnly 'org.postgresql:postgresql'
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
