@@ -27,10 +27,10 @@
                     <form:label path="id">Product ID:</form:label><br>
                     <form:input path="id" type="UUID" readonly="true" class="form-control" id="id" placeholder="Product ID" name="id" value="${product.id}"/><br>
                     <form:label path="name">Product name:</form:label><br>
-                    <form:input path="name" type="text" class="form-control" id="name" placeholder="Enter Product name" name="name" value="${product.name}"/><br>
+                    <form:input path="name" type="text" class="form-control" id="name" placeholder="Enter Product name" name="name" value="${product.name}"/>
                     <form:errors path="name" cssClass="error"/><br>
                     <form:label path="price">Product price:</form:label><br>
-                    <form:input path="price" type="number" class="form-control" id="name" placeholder="Enter Product price" name="name" value="${product.price}"/><br>
+                    <form:input path="price" type="number" class="form-control" id="name" placeholder="Enter Product price" name="name" value="${product.price}"/>
                     <form:errors path="price" cssClass="error"/><br><br>
                 </div>
                 <div class="row">

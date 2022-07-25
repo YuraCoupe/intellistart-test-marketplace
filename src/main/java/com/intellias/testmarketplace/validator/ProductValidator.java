@@ -46,7 +46,7 @@ public class ProductValidator implements Validator {
         Product productToFind = productRepository.findByName(product.getName()).orElse(new Product());
 
         if (Objects.isNull(product.getId()) && Objects.nonNull(productToFind.getId())) {
-            errors.rejectValue("name", " name.already.exist", "product with this name already exists");
+            errors.rejectValue("name", "name.already.exists", "Product with this name already exists");
         }
     }
 
