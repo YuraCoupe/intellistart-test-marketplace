@@ -20,7 +20,6 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -36,24 +35,22 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     private final RoleService roleService;
-    private final UserValidator validatorService;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(UserService userService, RoleService roleService, UserValidator validatorService, PasswordEncoder passwordEncoder) {
+    public UserController(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.roleService = roleService;
-        this.validatorService = validatorService;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Autowired
     @Qualifier("userValidator")
-    private Validator validator;
+    private UserValidator userValidator;
 
     @InitBinder("user")
-    private void initBinder(WebDataBinder binder) {
-        binder.addValidators(validator);
+    protected void initBinder(WebDataBinder binder) {
+        binder.setValidator(userValidator);
         binder.registerCustomEditor(Role.class, "roles", new RoleEditor(roleService));
     }
 
@@ -117,8 +114,9 @@ public class UserController {
         return "user";    }
 
     @RequestMapping(path = "/save", method = RequestMethod.POST)
-    public ModelAndView submit(@Valid @ModelAttribute("user") User user,
+    public ModelAndView submit(@ModelAttribute("user") @Valid User user,
                          BindingResult result) {
+        //userValidator.validate(user, result);
         ModelAndView model = new ModelAndView();
         if (result.hasErrors()) {
             model.addObject("user", user);
@@ -167,7 +165,7 @@ public class UserController {
     @RequestMapping(value="/delete/{id}",method = RequestMethod.GET)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String delete(@PathVariable UUID id, ModelMap model){
-        ErrorMessage errorMessage = validatorService.validateUserToDelete(id);
+        ErrorMessage errorMessage = userValidator.validateUserToDelete(id);
         if (!errorMessage.getErrors().isEmpty()) {
             model.addAttribute("errorMessage", errorMessage);
         } else {

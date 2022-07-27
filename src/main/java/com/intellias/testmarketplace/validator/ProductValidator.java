@@ -2,10 +2,8 @@ package com.intellias.testmarketplace.validator;
 
 import com.intellias.testmarketplace.model.ErrorMessage;
 import com.intellias.testmarketplace.model.Product;
-import com.intellias.testmarketplace.model.Role;
 import com.intellias.testmarketplace.model.User;
 import com.intellias.testmarketplace.repository.ProductRepository;
-import com.intellias.testmarketplace.repository.RoleRepository;
 import com.intellias.testmarketplace.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,9 +11,6 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-import javax.swing.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 
 @Component("productValidator")

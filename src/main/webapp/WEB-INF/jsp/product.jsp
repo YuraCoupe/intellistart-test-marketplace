@@ -30,7 +30,7 @@
                     <form:input path="name" type="text" class="form-control" id="name" placeholder="Enter Product name" name="name" value="${product.name}"/>
                     <form:errors path="name" cssClass="error"/><br>
                     <form:label path="price">Product price:</form:label><br>
-                    <form:input path="price" type="number" class="form-control" id="name" placeholder="Enter Product price" name="name" value="${product.price}"/>
+                    <form:input path="price" type="number" step="0.01" class="form-control" id="name" placeholder="Enter Product price" name="name" value="${product.price}"/>
                     <form:errors path="price" cssClass="error"/><br><br>
                 </div>
                 <div class="row">
