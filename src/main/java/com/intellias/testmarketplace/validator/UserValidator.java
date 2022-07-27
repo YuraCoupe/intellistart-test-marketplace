@@ -5,7 +5,9 @@ import com.intellias.testmarketplace.model.Role;
 import com.intellias.testmarketplace.model.User;
 import com.intellias.testmarketplace.repository.RoleRepository;
 import com.intellias.testmarketplace.repository.UserRepository;
+import org.apache.catalina.core.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.*;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
@@ -58,10 +60,7 @@ public class UserValidator implements Validator {
             errors.rejectValue("username", "username.already.exist", "user with this username already exists");
         }
 
-
-        BigDecimal bigDecimal = user.getMoney();
-
-        if (user.getRoles().isEmpty()) {
+        if (Objects.nonNull(user.getRoles()) && user.getRoles().isEmpty()) {
             errors.rejectValue("roles", "role.required", "role must be assigned");
         }
 
