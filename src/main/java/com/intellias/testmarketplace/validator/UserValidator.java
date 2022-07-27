@@ -7,22 +7,26 @@ import com.intellias.testmarketplace.repository.RoleRepository;
 import com.intellias.testmarketplace.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.Errors;
-import org.springframework.validation.ValidationUtils;
-import org.springframework.validation.Validator;
+import org.springframework.validation.*;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
+import javax.validation.ConstraintViolation;
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component("userValidator")
 public class UserValidator implements Validator {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final javax.validation.Validator validator;
 
     @Autowired
-    public UserValidator(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserValidator(UserRepository userRepository, RoleRepository roleRepository, javax.validation.Validator validator) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.validator = validator;
     }
 
     @Override
@@ -32,6 +36,13 @@ public class UserValidator implements Validator {
 
     @Override
     public void validate(Object obj, Errors errors) {
+        Set<ConstraintViolation<Object>> validates = validator.validate(obj);
+
+        for (ConstraintViolation<Object> constraintViolation : validates) {
+            String propertyPath = constraintViolation.getPropertyPath().toString();
+            String message = constraintViolation.getMessage();
+            errors.rejectValue(propertyPath, "", message);
+        }
 
         User user = (User) obj;
 
@@ -39,6 +50,7 @@ public class UserValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "firstName", "firstName.required", "Enter user first name");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "lastName", "lastName.required", "Enter user last name");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "password.required", "Enter user password");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "money", "money.required", "Enter user money");
 
         User userToFind = userRepository.findByUsername(user.getUsername()).orElse(new User());
 
@@ -46,9 +58,11 @@ public class UserValidator implements Validator {
             errors.rejectValue("username", "username.already.exist", "user with this username already exists");
         }
 
-        if (Objects.isNull(user.getRoles())) {
-            errors.rejectValue("roles", "role.required", "role must be assigned");
 
+        BigDecimal bigDecimal = user.getMoney();
+
+        if (user.getRoles().isEmpty()) {
+            errors.rejectValue("roles", "role.required", "role must be assigned");
         }
 
         Role adminRole = roleRepository.getAdminRole();
@@ -64,9 +78,9 @@ public class UserValidator implements Validator {
         ErrorMessage errorMessage = new ErrorMessage();
         List<String> errors = new ArrayList<>();
         Set<User> admins = userRepository.findUsersWithAdministratorRole();
-
-        if (admins.size() == 1) {
-            errors.add(String.format("User with email %s is the one with Admin role. Impossible to delete last Admin user."
+        User userToDelete = userRepository.findById(id).get();
+        if (admins.size() == 1 && userToDelete.getRoles().contains(roleRepository.getAdminRole())) {
+            errors.add(String.format("User with username %s is the one with Admin role. Impossible to delete last Admin user."
                     , userRepository.findById(id).get().getUsername()));
         }
         errorMessage.setErrors(errors);

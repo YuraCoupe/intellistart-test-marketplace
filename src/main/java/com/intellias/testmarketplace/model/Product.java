@@ -4,6 +4,8 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.Valid;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -41,7 +43,8 @@ public class Product {
     }
 
     @Column(name = "price")
-    @NotNull
+    @DecimalMin(message = "{price.min.value}", value = "0.0", inclusive = false)
+    @Digits(message = "{price.wrong.number}", integer = 10, fraction = 2)
     public BigDecimal getPrice() {
         return price;
     }

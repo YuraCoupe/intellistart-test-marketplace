@@ -5,9 +5,7 @@ import org.springframework.format.annotation.NumberFormat;
 
 import javax.persistence.*;
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
@@ -38,8 +36,6 @@ public class User {
     }
 
     @Column(name = "username")
-    @Valid
-    @NotEmpty
     public String getUsername() {
         return username;
     }
@@ -49,7 +45,6 @@ public class User {
     }
 
     @Column(name = "password")
-    @NotEmpty
     public String getPassword() {
         return password;
     }
@@ -59,7 +54,6 @@ public class User {
     }
 
     @Column(name = "first_name")
-    @NotEmpty
     public String getFirstName() {
         return firstName;
     }
@@ -69,7 +63,6 @@ public class User {
     }
 
     @Column(name = "last_name")
-    @NotEmpty
     public String getLastName() {
         return lastName;
     }
@@ -79,11 +72,11 @@ public class User {
     }
 
     @Column(name = "money")
-    @NumberFormat
+    @DecimalMin(message = "{money.min.value}", value = "0.0", inclusive = false)
+    @Digits(message = "{money.wrong.number}", integer = 10, fraction = 2)
     public BigDecimal getMoney() {
         return money;
     }
-
     public void setMoney(BigDecimal money) {
         this.money = money;
     }
@@ -94,6 +87,7 @@ public class User {
             joinColumns = { @JoinColumn(name = "user_id") },
             inverseJoinColumns = { @JoinColumn(name = "role_id") }
     )
+
     @NotNull
     public Set<Role> getRoles() {
         return roles;
