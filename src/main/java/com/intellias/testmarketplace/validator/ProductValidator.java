@@ -11,6 +11,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import javax.validation.ConstraintViolation;
 import java.util.*;
 
 @Component("productValidator")
@@ -18,11 +19,13 @@ public class ProductValidator implements Validator {
 
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final javax.validation.Validator validator;
 
     @Autowired
-    public ProductValidator(UserRepository userRepository, ProductRepository productRepository) {
+    public ProductValidator(UserRepository userRepository, ProductRepository productRepository, javax.validation.Validator validator) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.validator = validator;
     }
 
     @Override
@@ -32,6 +35,13 @@ public class ProductValidator implements Validator {
 
     @Override
     public void validate(Object obj, Errors errors) {
+        Set<ConstraintViolation<Object>> validates = validator.validate(obj);
+
+        for (ConstraintViolation<Object> constraintViolation : validates) {
+            String propertyPath = constraintViolation.getPropertyPath().toString();
+            String message = constraintViolation.getMessage();
+            errors.rejectValue(propertyPath, "", message);
+        }
 
         Product product = (Product) obj;
 
