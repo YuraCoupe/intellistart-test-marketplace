@@ -40,7 +40,7 @@ public class ProductController {
 
     @Autowired
     @Qualifier("productValidator")
-    private Validator validator;
+    private ProductValidator validator;
 
     @InitBinder("product")
     private void initBinder(WebDataBinder binder) {

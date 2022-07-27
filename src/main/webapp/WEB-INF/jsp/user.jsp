@@ -47,7 +47,7 @@
                     <form:errors path="lastName" cssClass="error"/>
                     <br>
                     <form:label path="money">Money:</form:label><br>
-                    <form:input path="money" type="number" class="form-control" id="money" placeholder="Enter money" name="money" value="${user.money}"/>
+                    <form:input path="money" type="number" step="0.01" class="form-control" id="money" placeholder="Enter money" name="money" value="${user.money}"/>
                     <form:errors path="money" cssClass="error"/>
                     <br>
                     <security:authorize access="hasRole('ROLE_ADMIN')">
