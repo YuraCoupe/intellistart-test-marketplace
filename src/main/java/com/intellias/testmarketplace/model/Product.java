@@ -3,11 +3,9 @@ package com.intellias.testmarketplace.model;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;

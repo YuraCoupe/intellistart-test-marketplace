@@ -19,7 +19,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -86,7 +85,6 @@ public class UserController {
     public String showNewForm(Model model) {
         Set<Role> roles = roleService.findAll();
         model.addAttribute("roles", roles);
-        //model.addAttribute("manufacturer", new Manufacturer());
         model.addAttribute("user", new User());
         return "user";
     }
@@ -96,7 +94,6 @@ public class UserController {
     public String showEditForm(@PathVariable UUID id, Model model) {
         Set<Role> roles = roleService.findAll();
         model.addAttribute("roles", roles);
-        //model.addAttribute("role", new Role());
         User user = userService.findById(id);
         user.setPassword("********");
         model.addAttribute("user", user);
@@ -107,7 +104,6 @@ public class UserController {
     public String showEditFormWithParam(@RequestParam UUID id, Model model) {
         Set<Role> roles = roleService.findAll();
         model.addAttribute("roles", roles);
-        //model.addAttribute("role", new Role());
         User user = userService.findById(id);
         user.setPassword("********");
         model.addAttribute("user", user);
@@ -116,7 +112,6 @@ public class UserController {
     @RequestMapping(path = "/save", method = RequestMethod.POST)
     public ModelAndView submit(@ModelAttribute("user") @Valid User user,
                          BindingResult result) {
-        //userValidator.validate(user, result);
         ModelAndView model = new ModelAndView();
         if (result.hasErrors()) {
             model.addObject("user", user);
@@ -129,9 +124,7 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if ((!(authentication instanceof AnonymousAuthenticationToken) && result.hasErrors())
                 || ((authentication instanceof AnonymousAuthenticationToken)) && result.hasErrors() && !result.hasFieldErrors("roles")){
-//            if (Objects.nonNull(user.getId())) {
-//                user = userService.findById(user.getId());
-//            }
+
             Set<Role> roles = roleService.findAll();
             model.addObject("roles", roles);
             model.addObject("user", user);
