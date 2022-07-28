@@ -15,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -188,9 +187,4 @@ public class ProductController {
         model.addAttribute("money", money);
         return "products";
     }
-
-    //@InitBinder
-    //public void initBinder(WebDataBinder binder) {
-    //    binder.registerCustomEditor(Manufacturer.class, "manufacturer", new ManufacturerEditor(userService));
-    //}
 }

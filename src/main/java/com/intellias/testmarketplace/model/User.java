@@ -1,10 +1,8 @@
 package com.intellias.testmarketplace.model;
 
 import org.hibernate.annotations.Type;
-import org.springframework.format.annotation.NumberFormat;
 
 import javax.persistence.*;
-import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.Objects;
